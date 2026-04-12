@@ -283,6 +283,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      reshuffle_leads: { Args: { _triggered_by: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "manager" | "agent"

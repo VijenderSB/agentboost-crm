@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp } from 'lucide-react';
+import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp, Shuffle } from 'lucide-react';
 import AppSidebar from '@/components/crm/AppSidebar';
 import AddAgentDialog from '@/components/crm/AddAgentDialog';
 import ReassignLeadsDialog from '@/components/crm/ReassignLeadsDialog';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 interface AgentStats {
@@ -22,8 +23,10 @@ interface AgentStats {
 }
 
 export default function AgentsPage() {
+  const { user } = useAuth();
   const [agents, setAgents] = useState<AgentStats[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reshuffling, setReshuffling] = useState(false);
   const [reassignAgent, setReassignAgent] = useState<{ id: string; name: string } | null>(null);
 
   const fetchAgents = async () => {
@@ -96,7 +99,26 @@ export default function AgentsPage() {
       <main className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6 overflow-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Agents</h1>
-          <AddAgentDialog onAdded={fetchAgents} />
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="gap-1.5"
+              disabled={reshuffling}
+              onClick={async () => {
+                if (!user) return;
+                setReshuffling(true);
+                const { data, error } = await supabase.rpc('reshuffle_leads', { _triggered_by: user.id });
+                setReshuffling(false);
+                if (error) { toast.error(error.message); return; }
+                toast.success(`${data} warm/cold lead(s) reshuffled across agents`);
+                fetchAgents();
+              }}
+            >
+              <Shuffle className="w-4 h-4" />
+              {reshuffling ? 'Reshuffling...' : 'Reshuffle'}
+            </Button>
+            <AddAgentDialog onAdded={fetchAgents} />
+          </div>
         </div>
 
         {loading ? (
