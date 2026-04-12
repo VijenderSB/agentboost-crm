@@ -76,7 +76,7 @@ export default function AgentsPage() {
   useEffect(() => { fetchAgents(); }, []);
 
   const updateRole = async (agentId: string, newRole: string) => {
-    const { error } = await supabase.from('user_roles').update({ role: newRole }).eq('user_id', agentId);
+    const { error } = await supabase.from('user_roles').update({ role: newRole as any }).eq('user_id', agentId);
     if (error) { toast.error(error.message); return; }
     toast.success('Role updated');
     fetchAgents();
