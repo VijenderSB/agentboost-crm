@@ -79,7 +79,7 @@ export default {
           cold: "hsl(var(--temp-cold))",
           junk: "hsl(var(--temp-junk))",
           success: "hsl(var(--temp-success))",
-          closed: "hsl(var(--temp-closed))",
+          lost: "hsl(var(--temp-lost))",
         },
         status: {
           fresh: "hsl(var(--status-fresh))",

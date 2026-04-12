@@ -60,7 +60,7 @@
     --temp-cold: 200 70% 55%;
     --temp-junk: 220 10% 60%;
     --temp-success: 160 70% 42%;
-    --temp-closed: 220 15% 40%;
+    --temp-lost: 220 15% 40%;
 
     /* Status colors */
     --status-fresh: 220 90% 55%;
