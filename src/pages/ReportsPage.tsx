@@ -43,11 +43,32 @@ export default function ReportsPage() {
   const [sourceConversion, setSourceConversion] = useState<any[]>([]);
   const [totals, setTotals] = useState({ leads: 0, conversions: 0, rate: '0', agents: 0 });
   const [loading, setLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [activePreset, setActivePreset] = useState<string>('all');
+
+  const applyPreset = (preset: string) => {
+    setActivePreset(preset);
+    const now = new Date();
+    switch (preset) {
+      case '7d': setDateFrom(subDays(now, 7)); setDateTo(now); break;
+      case '30d': setDateFrom(subDays(now, 30)); setDateTo(now); break;
+      case 'week': setDateFrom(startOfWeek(now, { weekStartsOn: 1 })); setDateTo(now); break;
+      case 'month': setDateFrom(startOfMonth(now)); setDateTo(now); break;
+      case 'year': setDateFrom(startOfYear(now)); setDateTo(now); break;
+      default: setDateFrom(undefined); setDateTo(undefined); break;
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      let query = supabase.from('leads').select('source, temperature, status, current_owner_id, created_at');
+      if (dateFrom) query = query.gte('created_at', dateFrom.toISOString());
+      if (dateTo) query = query.lte('created_at', dateTo.toISOString());
+
       const [{ data: leads }, { data: profiles }] = await Promise.all([
-        supabase.from('leads').select('source, temperature, status, current_owner_id, created_at'),
+        query,
         supabase.from('profiles').select('id, name'),
       ]);
 
