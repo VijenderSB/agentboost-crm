@@ -147,7 +147,7 @@ export default function ReportsPage() {
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [dateFrom, dateTo]);
 
   const sourceLabels: Record<string, string> = {
     'query form': 'Query Form', 'whatsapp': 'WhatsApp', 'ivr': 'IVR', 'chat': 'Chat',
