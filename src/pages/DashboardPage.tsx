@@ -1,47 +1,51 @@
-import { useEffect, useState } from 'react';
 import { Users, Flame, TrendingUp, Clock, Snowflake, CheckCircle, XCircle, Zap } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import AppSidebar from '@/components/crm/AppSidebar';
 import StatCard from '@/components/crm/StatCard';
 import LeadCard from '@/components/crm/LeadCard';
 import AddLeadDialog from '@/components/crm/AddLeadDialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useRealtimeLeads } from '@/hooks/use-realtime-leads';
 import type { Lead, DashboardStats } from '@/types/crm';
+
+const STATS_KEY = ['dashboard-stats'];
+const RECENT_KEY = ['dashboard-recent-leads'];
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const [stats, setStats] = useState<DashboardStats>({ total: 0, fresh: 0, super_hot: 0, hot: 0, warm: 0, cold: 0, success: 0, closed: 0, junk: 0 });
-  const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const { data: leads } = await supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(10);
-    
-    if (leads) {
-      setRecentLeads(leads as unknown as Lead[]);
-      
-      // Fetch all for stats
-      const { count: total } = await supabase.from('leads').select('*', { count: 'exact', head: true });
-      const { count: fresh } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('status', 'fresh');
-      const { count: super_hot } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'super_hot');
-      const { count: hot } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'hot');
-      const { count: warm } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'warm');
-      const { count: cold } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'cold');
-      const { count: success } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'success');
-      const { count: closed } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'closed');
-      const { count: junk } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'junk');
-      
-      setStats({
-        total: total || 0, fresh: fresh || 0, super_hot: super_hot || 0,
-        hot: hot || 0, warm: warm || 0, cold: cold || 0,
-        success: success || 0, closed: closed || 0, junk: junk || 0,
-      });
-    }
-    setLoading(false);
-  };
+  useRealtimeLeads([STATS_KEY, RECENT_KEY]);
 
-  useEffect(() => { fetchData(); }, []);
+  const { data: stats = { total: 0, fresh: 0, super_hot: 0, hot: 0, warm: 0, cold: 0, success: 0, closed: 0, junk: 0 } } = useQuery({
+    queryKey: STATS_KEY,
+    queryFn: async (): Promise<DashboardStats> => {
+      const counts = await Promise.all([
+        supabase.from('leads').select('*', { count: 'exact', head: true }),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('status', 'fresh'),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'super_hot'),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'hot'),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'warm'),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'cold'),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'success'),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'closed'),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'junk'),
+      ]);
+      return {
+        total: counts[0].count || 0, fresh: counts[1].count || 0, super_hot: counts[2].count || 0,
+        hot: counts[3].count || 0, warm: counts[4].count || 0, cold: counts[5].count || 0,
+        success: counts[6].count || 0, closed: counts[7].count || 0, junk: counts[8].count || 0,
+      };
+    },
+  });
+
+  const { data: recentLeads = [], isLoading } = useQuery({
+    queryKey: RECENT_KEY,
+    queryFn: async () => {
+      const { data } = await supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(10);
+      return (data as unknown as Lead[]) || [];
+    },
+  });
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -52,10 +56,9 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <p className="text-sm text-muted-foreground">Welcome back, {user?.name}</p>
           </div>
-          <AddLeadDialog onLeadAdded={fetchData} />
+          <AddLeadDialog />
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <StatCard label="Total Leads" value={stats.total} icon={Users} />
           <StatCard label="Fresh" value={stats.fresh} icon={Zap} color="bg-status-fresh/15" />
@@ -67,9 +70,8 @@ export default function DashboardPage() {
           <StatCard label="Closed" value={stats.closed} icon={XCircle} color="bg-temp-closed/15" />
         </div>
 
-        {/* Recent Leads */}
         <h2 className="text-lg font-semibold mb-3">Recent Leads</h2>
-        {loading ? (
+        {isLoading ? (
           <div className="text-center text-muted-foreground py-12">Loading...</div>
         ) : recentLeads.length === 0 ? (
           <div className="text-center text-muted-foreground py-12 bg-card rounded-xl border border-border">

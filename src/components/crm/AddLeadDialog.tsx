@@ -27,11 +27,7 @@ const leadSources: { value: LeadSource; label: string }[] = [
   { value: 'manual', label: 'Manual Entry' },
 ];
 
-interface AddLeadDialogProps {
-  onLeadAdded?: () => void;
-}
-
-export default function AddLeadDialog({ onLeadAdded }: AddLeadDialogProps) {
+export default function AddLeadDialog() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -71,7 +67,6 @@ export default function AddLeadDialog({ onLeadAdded }: AddLeadDialogProps) {
       toast.success('Lead added successfully');
       setForm({ name: '', mobile: '', city: '', source: '' as LeadSource, notes: '' });
       setOpen(false);
-      onLeadAdded?.();
     } catch (err: any) {
       toast.error(err.message || 'Failed to add lead');
     } finally {
