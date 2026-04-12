@@ -6,6 +6,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import NotificationBell from './NotificationBell';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', roles: ['admin', 'manager', 'agent'] },
