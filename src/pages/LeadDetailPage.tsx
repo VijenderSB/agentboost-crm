@@ -20,6 +20,7 @@ export default function LeadDetailPage() {
   const { user } = useAuth();
   const [lead, setLead] = useState<Lead | null>(null);
   const [activities, setActivities] = useState<LeadActivity[]>([]);
+  const [agentName, setAgentName] = useState('');
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(true);
 
