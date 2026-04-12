@@ -160,7 +160,65 @@ export default function ReportsPage() {
     <div className="flex min-h-screen bg-background">
       <AppSidebar />
       <main className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6 overflow-auto">
-        <h1 className="text-2xl font-bold mb-6">Reports</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <h1 className="text-2xl font-bold">Reports</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            {[
+              { key: 'all', label: 'All Time' },
+              { key: '7d', label: '7 Days' },
+              { key: '30d', label: '30 Days' },
+              { key: 'month', label: 'This Month' },
+              { key: 'year', label: 'This Year' },
+            ].map(p => (
+              <Button
+                key={p.key}
+                variant={activePreset === p.key ? 'default' : 'outline'}
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => applyPreset(p.key)}
+              >
+                {p.label}
+              </Button>
+            ))}
+            <div className="flex items-center gap-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className={cn('h-8 text-xs gap-1.5', !dateFrom && 'text-muted-foreground')}>
+                    <CalendarIcon className="w-3.5 h-3.5" />
+                    {dateFrom ? format(dateFrom, 'MMM d, yyyy') : 'From'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={dateFrom}
+                    onSelect={(d) => { setDateFrom(d); setActivePreset('custom'); }}
+                    initialFocus
+                    className={cn('p-3 pointer-events-auto')}
+                  />
+                </PopoverContent>
+              </Popover>
+              <span className="text-xs text-muted-foreground">–</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className={cn('h-8 text-xs gap-1.5', !dateTo && 'text-muted-foreground')}>
+                    <CalendarIcon className="w-3.5 h-3.5" />
+                    {dateTo ? format(dateTo, 'MMM d, yyyy') : 'To'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={dateTo}
+                    onSelect={(d) => { setDateTo(d); setActivePreset('custom'); }}
+                    initialFocus
+                    className={cn('p-3 pointer-events-auto')}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </div>
 
         {loading ? (
           <div className="text-center text-muted-foreground py-12">Loading...</div>
