@@ -6,6 +6,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import NotificationBell from './NotificationBell';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', roles: ['admin', 'manager', 'agent'] },
@@ -35,12 +36,15 @@ export default function AppSidebar() {
             Lead<span className="text-sidebar-primary">CRM</span>
           </h1>
         )}
-        <button 
-          onClick={() => setCollapsed(!collapsed)} 
-          className="hidden lg:flex p-1.5 rounded-md hover:bg-sidebar-accent transition-colors"
-        >
-          <ChevronLeft className={cn("w-4 h-4 transition-transform", collapsed && "rotate-180")} />
-        </button>
+        <div className="flex items-center gap-1">
+          <NotificationBell />
+          <button 
+            onClick={() => setCollapsed(!collapsed)} 
+            className="hidden lg:flex p-1.5 rounded-md hover:bg-sidebar-accent transition-colors"
+          >
+            <ChevronLeft className={cn("w-4 h-4 transition-transform", collapsed && "rotate-180")} />
+          </button>
+        </div>
       </div>
 
       {/* Navigation */}
