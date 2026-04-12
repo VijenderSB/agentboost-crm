@@ -36,6 +36,13 @@ export default function LeadDetailPage() {
 
   useEffect(() => { fetchLead(); }, [id]);
 
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('profiles').select('name').eq('id', user.id).single().then(({ data }) => {
+      if (data) setAgentName((data as any).name);
+    });
+  }, [user]);
+
   const updateLead = async (updates: Partial<Lead>) => {
     if (!id) return;
     const { error } = await supabase.from('leads').update(updates as any).eq('id', id);
