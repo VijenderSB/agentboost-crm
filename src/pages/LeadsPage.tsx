@@ -44,7 +44,7 @@ export default function LeadsPage() {
       <main className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6 overflow-auto">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Leads</h1>
-          <AddLeadDialog onLeadAdded={fetchLeads} />
+          <AddLeadDialog />
         </div>
 
         {/* Filters */}
