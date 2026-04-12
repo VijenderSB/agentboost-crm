@@ -198,19 +198,7 @@ export default function LeadDetailPage() {
           {/* Activity Timeline */}
           <div className="bg-card rounded-xl border border-border p-5">
             <h3 className="font-semibold mb-4">Activity Timeline</h3>
-            {activities.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No activity yet</p>
-            ) : (
-              <div className="space-y-3">
-                {activities.map(act => (
-                  <div key={act.id} className="border-l-2 border-primary/20 pl-3 pb-3">
-                    <p className="text-xs text-muted-foreground capitalize">{act.activity_type}</p>
-                    <p className="text-sm mt-0.5">{act.remarks}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{new Date(act.created_at).toLocaleString()}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+            <LeadTimeline leadId={id!} />
           </div>
         </div>
       </main>
