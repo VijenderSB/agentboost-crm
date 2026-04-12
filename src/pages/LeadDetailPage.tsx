@@ -185,7 +185,7 @@ export default function LeadDetailPage() {
                       <SelectItem value="cold">Cold</SelectItem>
                       <SelectItem value="junk">Junk</SelectItem>
                       <SelectItem value="success">Success</SelectItem>
-                      <SelectItem value="closed">Closed</SelectItem>
+                      <SelectItem value="lost">Lost</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

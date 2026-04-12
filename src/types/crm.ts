@@ -1,7 +1,7 @@
 export type UserRole = 'admin' | 'manager' | 'agent';
 
 export type LeadStatus = 'fresh' | 'connected' | 'not_connected' | 'followup';
-export type LeadTemperature = 'super_hot' | 'hot' | 'warm' | 'cold' | 'junk' | 'success' | 'closed';
+export type LeadTemperature = 'super_hot' | 'hot' | 'warm' | 'cold' | 'junk' | 'success' | 'lost';
 
 export type LeadSource = 
   | 'query_form' | 'whatsapp' | 'ivr' | 'chat'
@@ -56,6 +56,6 @@ export interface DashboardStats {
   warm: number;
   cold: number;
   success: number;
-  closed: number;
+  lost: number;
   junk: number;
 }

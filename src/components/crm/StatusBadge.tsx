@@ -15,7 +15,7 @@ const tempStyles: Record<LeadTemperature, string> = {
   cold: 'bg-temp-cold/15 text-temp-cold',
   junk: 'bg-temp-junk/15 text-temp-junk',
   success: 'bg-temp-success/15 text-temp-success',
-  closed: 'bg-temp-closed/15 text-temp-closed',
+  lost: 'bg-temp-lost/15 text-temp-lost',
 };
 
 const statusLabels: Record<LeadStatus, string> = {
@@ -32,7 +32,7 @@ const tempLabels: Record<LeadTemperature, string> = {
   cold: 'Cold',
   junk: 'Junk',
   success: '✅ Success',
-  closed: 'Closed',
+  lost: 'Lost',
 };
 
 export function LeadStatusBadge({ status }: { status: LeadStatus }) {

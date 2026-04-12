@@ -17,7 +17,7 @@ export default function DashboardPage() {
 
   useRealtimeLeads([STATS_KEY, RECENT_KEY]);
 
-  const { data: stats = { total: 0, fresh: 0, super_hot: 0, hot: 0, warm: 0, cold: 0, success: 0, closed: 0, junk: 0 } } = useQuery({
+  const { data: stats = { total: 0, fresh: 0, super_hot: 0, hot: 0, warm: 0, cold: 0, success: 0, lost: 0, junk: 0 } } = useQuery({
     queryKey: STATS_KEY,
     queryFn: async (): Promise<DashboardStats> => {
       const counts = await Promise.all([
@@ -28,13 +28,13 @@ export default function DashboardPage() {
         supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'warm'),
         supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'cold'),
         supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'success'),
-        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'closed'),
+        supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'lost'),
         supabase.from('leads').select('*', { count: 'exact', head: true }).eq('temperature', 'junk'),
       ]);
       return {
         total: counts[0].count || 0, fresh: counts[1].count || 0, super_hot: counts[2].count || 0,
         hot: counts[3].count || 0, warm: counts[4].count || 0, cold: counts[5].count || 0,
-        success: counts[6].count || 0, closed: counts[7].count || 0, junk: counts[8].count || 0,
+        success: counts[6].count || 0, lost: counts[7].count || 0, junk: counts[8].count || 0,
       };
     },
   });
@@ -67,7 +67,7 @@ export default function DashboardPage() {
           <StatCard label="Warm" value={stats.warm} icon={Clock} color="bg-temp-warm/15" />
           <StatCard label="Cold" value={stats.cold} icon={Snowflake} color="bg-temp-cold/15" />
           <StatCard label="Success" value={stats.success} icon={CheckCircle} color="bg-temp-success/15" />
-          <StatCard label="Closed" value={stats.closed} icon={XCircle} color="bg-temp-closed/15" />
+          <StatCard label="Lost" value={stats.lost} icon={XCircle} color="bg-temp-lost/15" />
         </div>
 
         <h2 className="text-lg font-semibold mb-3">Recent Leads</h2>
