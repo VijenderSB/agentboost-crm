@@ -149,11 +149,9 @@ export default function LeadDetailPage() {
                     <Phone className="w-4 h-4" /> Call
                   </Button>
                 </a>
-                <a href={`https://wa.me/${lead.mobile.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1">
-                  <Button variant="outline" className="w-full gap-2 text-accent border-accent/30 hover:bg-accent/10">
-                    <MessageCircle className="w-4 h-4" /> WhatsApp
-                  </Button>
-                </a>
+                <div className="flex-1">
+                  <WhatsAppTemplates lead={lead} agentName={agentName} />
+                </div>
                 <Button onClick={convertLead} className="flex-1 gap-2">
                   Convert
                 </Button>
