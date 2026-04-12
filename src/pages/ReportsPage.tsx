@@ -1,11 +1,16 @@
 import AppSidebar from '@/components/crm/AppSidebar';
 import { useEffect, useState } from 'react';
+import { format, subDays, startOfMonth, startOfYear, startOfWeek } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend,
 } from 'recharts';
-import { TrendingUp, Users, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, Users, Target, BarChart3, CalendarIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 const COLORS = [
   'hsl(220, 90%, 56%)', 'hsl(160, 70%, 42%)', 'hsl(38, 95%, 55%)',
@@ -38,11 +43,32 @@ export default function ReportsPage() {
   const [sourceConversion, setSourceConversion] = useState<any[]>([]);
   const [totals, setTotals] = useState({ leads: 0, conversions: 0, rate: '0', agents: 0 });
   const [loading, setLoading] = useState(true);
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [activePreset, setActivePreset] = useState<string>('all');
+
+  const applyPreset = (preset: string) => {
+    setActivePreset(preset);
+    const now = new Date();
+    switch (preset) {
+      case '7d': setDateFrom(subDays(now, 7)); setDateTo(now); break;
+      case '30d': setDateFrom(subDays(now, 30)); setDateTo(now); break;
+      case 'week': setDateFrom(startOfWeek(now, { weekStartsOn: 1 })); setDateTo(now); break;
+      case 'month': setDateFrom(startOfMonth(now)); setDateTo(now); break;
+      case 'year': setDateFrom(startOfYear(now)); setDateTo(now); break;
+      default: setDateFrom(undefined); setDateTo(undefined); break;
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      let query = supabase.from('leads').select('source, temperature, status, current_owner_id, created_at');
+      if (dateFrom) query = query.gte('created_at', dateFrom.toISOString());
+      if (dateTo) query = query.lte('created_at', dateTo.toISOString());
+
       const [{ data: leads }, { data: profiles }] = await Promise.all([
-        supabase.from('leads').select('source, temperature, status, current_owner_id, created_at'),
+        query,
         supabase.from('profiles').select('id, name'),
       ]);
 
@@ -121,7 +147,7 @@ export default function ReportsPage() {
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [dateFrom, dateTo]);
 
   const sourceLabels: Record<string, string> = {
     'query form': 'Query Form', 'whatsapp': 'WhatsApp', 'ivr': 'IVR', 'chat': 'Chat',
@@ -134,7 +160,65 @@ export default function ReportsPage() {
     <div className="flex min-h-screen bg-background">
       <AppSidebar />
       <main className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6 overflow-auto">
-        <h1 className="text-2xl font-bold mb-6">Reports</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <h1 className="text-2xl font-bold">Reports</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            {[
+              { key: 'all', label: 'All Time' },
+              { key: '7d', label: '7 Days' },
+              { key: '30d', label: '30 Days' },
+              { key: 'month', label: 'This Month' },
+              { key: 'year', label: 'This Year' },
+            ].map(p => (
+              <Button
+                key={p.key}
+                variant={activePreset === p.key ? 'default' : 'outline'}
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => applyPreset(p.key)}
+              >
+                {p.label}
+              </Button>
+            ))}
+            <div className="flex items-center gap-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className={cn('h-8 text-xs gap-1.5', !dateFrom && 'text-muted-foreground')}>
+                    <CalendarIcon className="w-3.5 h-3.5" />
+                    {dateFrom ? format(dateFrom, 'MMM d, yyyy') : 'From'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={dateFrom}
+                    onSelect={(d) => { setDateFrom(d); setActivePreset('custom'); }}
+                    initialFocus
+                    className={cn('p-3 pointer-events-auto')}
+                  />
+                </PopoverContent>
+              </Popover>
+              <span className="text-xs text-muted-foreground">–</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className={cn('h-8 text-xs gap-1.5', !dateTo && 'text-muted-foreground')}>
+                    <CalendarIcon className="w-3.5 h-3.5" />
+                    {dateTo ? format(dateTo, 'MMM d, yyyy') : 'To'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="end">
+                  <Calendar
+                    mode="single"
+                    selected={dateTo}
+                    onSelect={(d) => { setDateTo(d); setActivePreset('custom'); }}
+                    initialFocus
+                    className={cn('p-3 pointer-events-auto')}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </div>
 
         {loading ? (
           <div className="text-center text-muted-foreground py-12">Loading...</div>
