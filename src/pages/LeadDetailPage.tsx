@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Phone, MessageCircle, ArrowLeft, Clock, User, MapPin, Globe } from 'lucide-react';
+import { Phone, MessageCircle, ArrowLeft, Clock, MapPin, Globe } from 'lucide-react';
+import LeadTimeline from '@/components/crm/LeadTimeline';
 import AppSidebar from '@/components/crm/AppSidebar';
 import { LeadStatusBadge, TemperatureBadge } from '@/components/crm/StatusBadge';
 import { Button } from '@/components/ui/button';
