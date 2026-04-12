@@ -1,11 +1,16 @@
 import AppSidebar from '@/components/crm/AppSidebar';
 import { useEffect, useState } from 'react';
+import { format, subDays, startOfMonth, startOfYear, startOfWeek } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line, Legend,
 } from 'recharts';
-import { TrendingUp, Users, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, Users, Target, BarChart3, CalendarIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 const COLORS = [
   'hsl(220, 90%, 56%)', 'hsl(160, 70%, 42%)', 'hsl(38, 95%, 55%)',
