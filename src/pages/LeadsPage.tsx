@@ -19,8 +19,8 @@ export default function LeadsPage() {
     setLoading(true);
     let query = supabase.from('leads').select('*').order('created_at', { ascending: false });
     
-    if (statusFilter !== 'all') query = query.eq('status', statusFilter);
-    if (tempFilter !== 'all') query = query.eq('temperature', tempFilter);
+    if (statusFilter !== 'all') query = query.eq('status', statusFilter as any);
+    if (tempFilter !== 'all') query = query.eq('temperature', tempFilter as any);
     
     const { data } = await query;
     let filtered = (data as unknown as Lead[]) || [];
