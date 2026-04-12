@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp } from 'lucide-react';
+import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp, Shuffle } from 'lucide-react';
 import AppSidebar from '@/components/crm/AppSidebar';
 import AddAgentDialog from '@/components/crm/AddAgentDialog';
 import ReassignLeadsDialog from '@/components/crm/ReassignLeadsDialog';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 interface AgentStats {
