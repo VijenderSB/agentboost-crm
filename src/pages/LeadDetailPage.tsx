@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Phone, MessageCircle, ArrowLeft, Clock, MapPin, Globe } from 'lucide-react';
 import LeadTimeline from '@/components/crm/LeadTimeline';
+import WhatsAppTemplates from '@/components/crm/WhatsAppTemplates';
 import AppSidebar from '@/components/crm/AppSidebar';
 import { LeadStatusBadge, TemperatureBadge } from '@/components/crm/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ export default function LeadDetailPage() {
   const { user } = useAuth();
   const [lead, setLead] = useState<Lead | null>(null);
   const [activities, setActivities] = useState<LeadActivity[]>([]);
+  const [agentName, setAgentName] = useState('');
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -33,6 +35,13 @@ export default function LeadDetailPage() {
   };
 
   useEffect(() => { fetchLead(); }, [id]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('profiles').select('name').eq('id', user.id).single().then(({ data }) => {
+      if (data) setAgentName((data as any).name);
+    });
+  }, [user]);
 
   const updateLead = async (updates: Partial<Lead>) => {
     if (!id) return;
@@ -140,11 +149,9 @@ export default function LeadDetailPage() {
                     <Phone className="w-4 h-4" /> Call
                   </Button>
                 </a>
-                <a href={`https://wa.me/${lead.mobile.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1">
-                  <Button variant="outline" className="w-full gap-2 text-accent border-accent/30 hover:bg-accent/10">
-                    <MessageCircle className="w-4 h-4" /> WhatsApp
-                  </Button>
-                </a>
+                <div className="flex-1">
+                  <WhatsAppTemplates lead={lead} agentName={agentName} />
+                </div>
                 <Button onClick={convertLead} className="flex-1 gap-2">
                   Convert
                 </Button>
