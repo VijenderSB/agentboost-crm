@@ -29,6 +29,7 @@ export default function AgentsPage() {
   const [loading, setLoading] = useState(true);
   const [reshuffling, setReshuffling] = useState(false);
   const [reassignAgent, setReassignAgent] = useState<{ id: string; name: string } | null>(null);
+  const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
 
   const fetchAgents = async () => {
     setLoading(true);
