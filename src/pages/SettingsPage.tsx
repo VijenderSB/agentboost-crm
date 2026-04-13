@@ -48,6 +48,7 @@ export default function SettingsPage() {
           </Button>
         </div>
 
+        <AgentPhoneManager />
         <EyeCentreManager />
       </main>
     </div>
