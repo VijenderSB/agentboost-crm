@@ -12,6 +12,7 @@ export type LeadSource =
 export interface Lead {
   id: string;
   mobile: string;
+  alternative_mobile?: string;
   name: string;
   city: string;
   source: LeadSource;
