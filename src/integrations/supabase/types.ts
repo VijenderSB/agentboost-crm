@@ -441,6 +441,132 @@ export type Database = {
         }
         Relationships: []
       }
+      wa_campaign_messages: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          lead_id: string
+          lead_mobile: string
+          lead_name: string
+          message: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          lead_id: string
+          lead_mobile?: string
+          lead_name?: string
+          message?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          lead_id?: string
+          lead_mobile?: string
+          lead_name?: string
+          message?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wa_campaign_messages_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "wa_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wa_campaign_messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wa_campaigns: {
+        Row: {
+          agent_id: string
+          created_at: string
+          created_by: string
+          date_from: string | null
+          date_to: string | null
+          filters: Json
+          id: string
+          messages_failed: number
+          messages_sent: number
+          name: string
+          status: string
+          template_id: string | null
+          total_leads: number
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          created_by: string
+          date_from?: string | null
+          date_to?: string | null
+          filters?: Json
+          id?: string
+          messages_failed?: number
+          messages_sent?: number
+          name?: string
+          status?: string
+          template_id?: string | null
+          total_leads?: number
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          created_by?: string
+          date_from?: string | null
+          date_to?: string | null
+          filters?: Json
+          id?: string
+          messages_failed?: number
+          messages_sent?: number
+          name?: string
+          status?: string
+          template_id?: string | null
+          total_leads?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wa_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       whatsapp_templates: {
         Row: {
           category: string
