@@ -77,7 +77,9 @@ export default function AppSidebar() {
           {!collapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{user?.name}</p>
-              <p className="text-xs text-sidebar-foreground/50 capitalize">{user?.role}</p>
+              <p className="text-xs text-sidebar-foreground/50 capitalize">
+                {user?.role === 'admin' ? 'Super Admin' : user?.role === 'manager' ? 'Admin' : 'Agent'}
+              </p>
             </div>
           )}
         </div>

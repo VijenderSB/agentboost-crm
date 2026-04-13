@@ -34,12 +34,12 @@ export default function LeadTimeline({ leadId }: Props) {
       const timeline: TimelineEvent[] = [];
 
       (activities || []).forEach((a: any) => {
-        const isNote = a.activity_type === 'note';
+        const isNote = a.activity_type === 'note' || a.activity_type === 'comment';
         timeline.push({
           id: `act-${a.id}`,
           type: 'activity',
           icon: isNote ? 'note' : 'status',
-          title: isNote ? 'Note added' : a.activity_type,
+          title: a.activity_type === 'comment' ? 'Comment' : isNote ? 'Note added' : a.activity_type,
           description: a.remarks || '',
           date: a.created_at,
           actor: nameMap.get(a.user_id) || 'System',
