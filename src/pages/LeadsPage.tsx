@@ -234,6 +234,7 @@ export default function LeadsPage() {
                     <TableHead className="text-xs min-w-[100px]">Status</TableHead>
                     <TableHead className="text-xs min-w-[100px]">Temperature</TableHead>
                     <TableHead className="text-xs min-w-[120px]">Source</TableHead>
+                    <TableHead className="text-xs min-w-[180px]">Eye Centre(s)</TableHead>
                     <TableHead className="text-xs min-w-[110px]">First Owner</TableHead>
                     <TableHead className="text-xs min-w-[110px]">Current Agent</TableHead>
                     <TableHead className="text-xs min-w-[110px]">Conversion Agent</TableHead>
@@ -242,7 +243,6 @@ export default function LeadsPage() {
                     <TableHead className="text-xs min-w-[90px]">Follow-up</TableHead>
                     <TableHead className="text-xs min-w-[90px]">Updated</TableHead>
                     <TableHead className="text-xs min-w-[200px]">Ownership History</TableHead>
-                    <TableHead className="text-xs min-w-[180px]">Eye Centre(s)</TableHead>
                     <TableHead className="text-xs min-w-[150px]">Notes</TableHead>
                   </TableRow>
                 </TableHeader>
