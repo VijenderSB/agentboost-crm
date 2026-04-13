@@ -15,12 +15,14 @@ import type { Lead } from '@/types/crm';
 
 interface Agent { id: string; name: string; }
 interface OwnershipEntry { lead_id: string; owner_id: string; started_at: string; ended_at: string | null; }
+interface EyeCentreRef { lead_id: string; eye_centre_id: string; centre_name: string; }
 
 export default function LeadsPage() {
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [ownershipMap, setOwnershipMap] = useState<Map<string, OwnershipEntry[]>>(new Map());
+  const [eyeCentreMap, setEyeCentreMap] = useState<Map<string, string[]>>(new Map());
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
@@ -44,9 +46,11 @@ export default function LeadsPage() {
     if (sourceFilter !== 'all') query = query.eq('source', sourceFilter as any);
     if (agentFilter !== 'all') query = query.eq('current_owner_id', agentFilter);
 
-    const [{ data }, { data: historyData }] = await Promise.all([
+    const [{ data }, { data: historyData }, { data: eyeCentreData }, { data: centresData }] = await Promise.all([
       query,
       supabase.from('lead_ownership_history').select('lead_id, owner_id, started_at, ended_at').order('started_at', { ascending: true }),
+      supabase.from('lead_eye_centres').select('lead_id, eye_centre_id'),
+      supabase.from('eye_centres').select('id, name'),
     ]);
     let filtered = (data as unknown as Lead[]) || [];
 
@@ -65,6 +69,16 @@ export default function LeadsPage() {
       oMap.set(h.lead_id, arr);
     });
     setOwnershipMap(oMap);
+
+    // Build eye centre map
+    const centreNames = new Map((centresData || []).map((c: any) => [c.id, c.name]));
+    const ecMap = new Map<string, string[]>();
+    (eyeCentreData || []).forEach((e: any) => {
+      const arr = ecMap.get(e.lead_id) || [];
+      arr.push(centreNames.get(e.eye_centre_id) || 'Unknown');
+      ecMap.set(e.lead_id, arr);
+    });
+    setEyeCentreMap(ecMap);
 
     setLeads(filtered);
     setLoading(false);
@@ -228,6 +242,7 @@ export default function LeadsPage() {
                     <TableHead className="text-xs min-w-[90px]">Follow-up</TableHead>
                     <TableHead className="text-xs min-w-[90px]">Updated</TableHead>
                     <TableHead className="text-xs min-w-[200px]">Ownership History</TableHead>
+                    <TableHead className="text-xs min-w-[180px]">Eye Centre(s)</TableHead>
                     <TableHead className="text-xs min-w-[150px]">Notes</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -289,6 +304,21 @@ export default function LeadsPage() {
                                   </span>
                                 );
                               })}
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground max-w-[200px]">
+                        {(() => {
+                          const centres = eyeCentreMap.get(lead.id) || [];
+                          if (centres.length === 0) return '—';
+                          return (
+                            <div className="flex flex-wrap gap-1">
+                              {centres.map((name, i) => (
+                                <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-accent text-accent-foreground">
+                                  {name}
+                                </span>
+                              ))}
                             </div>
                           );
                         })()}
