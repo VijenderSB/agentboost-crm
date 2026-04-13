@@ -12,6 +12,7 @@ import FollowupsPage from "./pages/FollowupsPage";
 import AgentsPage from "./pages/AgentsPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
+import WhatsAppTemplatesPage from "./pages/WhatsAppTemplatesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const AppRoutes = () => (
     <Route path="/agents" element={<ProtectedRoute><AgentsPage /></ProtectedRoute>} />
     <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
     <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+    <Route path="/whatsapp-templates" element={<ProtectedRoute><WhatsAppTemplatesPage /></ProtectedRoute>} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
