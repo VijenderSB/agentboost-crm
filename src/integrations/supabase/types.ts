@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      eye_centres: {
+        Row: {
+          city: string
+          created_at: string
+          id: string
+          name: string
+          status: string
+        }
+        Insert: {
+          city?: string
+          created_at?: string
+          id?: string
+          name: string
+          status?: string
+        }
+        Update: {
+          city?: string
+          created_at?: string
+          id?: string
+          name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       followups: {
         Row: {
           assigned_to: string
@@ -112,6 +136,45 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "lead_assignments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_eye_centres: {
+        Row: {
+          eye_centre_id: string
+          id: string
+          lead_id: string
+          referred_at: string
+          referred_by: string
+        }
+        Insert: {
+          eye_centre_id: string
+          id?: string
+          lead_id: string
+          referred_at?: string
+          referred_by: string
+        }
+        Update: {
+          eye_centre_id?: string
+          id?: string
+          lead_id?: string
+          referred_at?: string
+          referred_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_eye_centres_eye_centre_id_fkey"
+            columns: ["eye_centre_id"]
+            isOneToOne: false
+            referencedRelation: "eye_centres"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_eye_centres_lead_id_fkey"
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
