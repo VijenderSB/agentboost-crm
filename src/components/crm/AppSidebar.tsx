@@ -14,7 +14,7 @@ const navItems = [
   { icon: Calendar, label: 'Follow-ups', path: '/followups', roles: ['admin', 'manager', 'agent'] },
   { icon: Phone, label: 'Agents', path: '/agents', roles: ['admin', 'manager'] },
   { icon: BarChart3, label: 'Reports', path: '/reports', roles: ['admin', 'manager'] },
-  { icon: Settings, label: 'Settings', path: '/settings', roles: ['admin'] },
+  { icon: Settings, label: 'Settings', path: '/settings', roles: ['admin', 'manager'] },
 ];
 
 export default function AppSidebar() {
