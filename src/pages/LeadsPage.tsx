@@ -44,7 +44,10 @@ export default function LeadsPage() {
     if (sourceFilter !== 'all') query = query.eq('source', sourceFilter as any);
     if (agentFilter !== 'all') query = query.eq('current_owner_id', agentFilter);
 
-    const { data } = await query;
+    const [{ data }, { data: historyData }] = await Promise.all([
+      query,
+      supabase.from('lead_ownership_history').select('lead_id, owner_id, started_at, ended_at').order('started_at', { ascending: true }),
+    ]);
     let filtered = (data as unknown as Lead[]) || [];
 
     if (search.trim()) {
@@ -53,6 +56,15 @@ export default function LeadsPage() {
         l.name?.toLowerCase().includes(s) || l.mobile?.includes(s) || l.city?.toLowerCase().includes(s)
       );
     }
+
+    // Build ownership history map
+    const oMap = new Map<string, OwnershipEntry[]>();
+    (historyData || []).forEach((h: any) => {
+      const arr = oMap.get(h.lead_id) || [];
+      arr.push(h);
+      oMap.set(h.lead_id, arr);
+    });
+    setOwnershipMap(oMap);
 
     setLeads(filtered);
     setLoading(false);
