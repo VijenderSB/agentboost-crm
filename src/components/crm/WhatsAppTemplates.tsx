@@ -13,6 +13,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Textarea } from '@/components/ui/textarea';
 import type { Lead } from '@/types/crm';
 
+export interface EyeCentreInfo {
+  name: string;
+  city: string;
+  address: string;
+  google_maps_url: string;
+}
+
 interface Template {
   id: string;
   label: string;
@@ -20,12 +27,26 @@ interface Template {
   message: string;
 }
 
-const templates: Template[] = [
+const baseTemplates: Template[] = [
   {
     id: 'intro',
     label: 'Introduction',
     category: 'First Contact',
     message: `Hi {{name}}, this is {{agent}} from our team. Thank you for your interest! I'd love to help you with any questions. When would be a good time to connect?`,
+  },
+  {
+    id: 'eye_centre_referral',
+    label: 'Eye Centre Referral',
+    category: 'First Contact',
+    message: `Hi {{name}}, this is {{agent}}. Thank you for your interest in Lasik surgery! 🏥
+
+We have scheduled your consultation at:
+
+*{{eye_centre_name}}*
+📍 {{eye_centre_address}}
+📌 Location: {{eye_centre_maps}}
+
+Please visit the centre at your convenience. Feel free to reach out if you need any assistance!`,
   },
   {
     id: 'followup_1',
@@ -68,17 +89,57 @@ const templates: Template[] = [
 interface Props {
   lead: Lead;
   agentName?: string;
+  eyeCentres?: EyeCentreInfo[];
 }
 
-export default function WhatsAppTemplates({ lead, agentName = 'your agent' }: Props) {
+export default function WhatsAppTemplates({ lead, agentName = 'your agent', eyeCentres = [] }: Props) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [editedMessage, setEditedMessage] = useState('');
 
+  // Build dynamic eye centre referral templates if multiple centres
+  const templates: Template[] = [...baseTemplates];
+
+  // If lead has multiple eye centres, add one template per centre
+  if (eyeCentres.length > 1) {
+    eyeCentres.forEach((ec, i) => {
+      templates.push({
+        id: `eye_centre_referral_${i}`,
+        label: `Refer to ${ec.name}`,
+        category: 'Eye Centre Referral',
+        message: `Hi {{name}}, this is {{agent}}. Thank you for your interest in Lasik surgery! 🏥
+
+We have scheduled your consultation at:
+
+*${ec.name}*
+📍 ${ec.address || ec.city}
+📌 Location: ${ec.google_maps_url || 'Will be shared'}
+
+Please visit the centre at your convenience. Feel free to reach out if you need any assistance!`,
+      });
+    });
+  }
+
   const fillTemplate = (msg: string) => {
-    return msg
+    let filled = msg
       .replace(/\{\{name\}\}/g, lead.name || 'there')
       .replace(/\{\{agent\}\}/g, agentName);
+
+    // Fill eye centre placeholders with first centre if available
+    if (eyeCentres.length > 0) {
+      const ec = eyeCentres[0];
+      filled = filled
+        .replace(/\{\{eye_centre_name\}\}/g, ec.name)
+        .replace(/\{\{eye_centre_address\}\}/g, ec.address || ec.city || 'Address to be shared')
+        .replace(/\{\{eye_centre_maps\}\}/g, ec.google_maps_url || 'Map link to be shared');
+    } else {
+      filled = filled
+        .replace(/\{\{eye_centre_name\}\}/g, '[Eye Centre Name]')
+        .replace(/\{\{eye_centre_address\}\}/g, '[Address]')
+        .replace(/\{\{eye_centre_maps\}\}/g, '[Map Link]');
+    }
+
+    return filled;
   };
 
   const openPreview = (template: Template) => {
@@ -141,7 +202,7 @@ export default function WhatsAppTemplates({ lead, agentName = 'your agent' }: Pr
             <Textarea
               value={editedMessage}
               onChange={e => setEditedMessage(e.target.value)}
-              rows={5}
+              rows={8}
               className="resize-none"
             />
             <div className="flex gap-2">

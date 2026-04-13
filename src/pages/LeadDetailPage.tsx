@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Phone, MessageCircle, ArrowLeft, Clock, MapPin, Globe, PhoneCall } from 'lucide-react';
 import LeadTimeline from '@/components/crm/LeadTimeline';
 import OwnershipHistory from '@/components/crm/OwnershipHistory';
-import WhatsAppTemplates from '@/components/crm/WhatsAppTemplates';
+import WhatsAppTemplates, { type EyeCentreInfo } from '@/components/crm/WhatsAppTemplates';
 import LeadEyeCentres from '@/components/crm/LeadEyeCentres';
 import AppSidebar from '@/components/crm/AppSidebar';
 import { LeadStatusBadge, TemperatureBadge } from '@/components/crm/StatusBadge';
@@ -26,6 +26,7 @@ export default function LeadDetailPage() {
   const [agentName, setAgentName] = useState('');
   const [comment, setComment] = useState('');
   const [altMobile, setAltMobile] = useState('');
+  const [leadEyeCentres, setLeadEyeCentres] = useState<EyeCentreInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
   const isAdmin = user?.role === 'admin';
@@ -43,6 +44,17 @@ export default function LeadDetailPage() {
 
     const { data: acts } = await supabase.from('lead_activities').select('*').eq('lead_id', id).order('created_at', { ascending: false });
     if (acts) setActivities(acts as unknown as LeadActivity[]);
+
+    // Fetch linked eye centres with details
+    const { data: linkedEc } = await supabase.from('lead_eye_centres').select('eye_centre_id').eq('lead_id', id);
+    if (linkedEc && linkedEc.length > 0) {
+      const ecIds = linkedEc.map((l: any) => l.eye_centre_id);
+      const { data: ecData } = await supabase.from('eye_centres').select('name, city, address, google_maps_url').in('id', ecIds);
+      if (ecData) setLeadEyeCentres(ecData as unknown as EyeCentreInfo[]);
+    } else {
+      setLeadEyeCentres([]);
+    }
+
     setLoading(false);
   };
 
@@ -177,7 +189,7 @@ export default function LeadDetailPage() {
                   </a>
                 )}
                 <div className="flex-1">
-                  <WhatsAppTemplates lead={lead} agentName={agentName} />
+                  <WhatsAppTemplates lead={lead} agentName={agentName} eyeCentres={leadEyeCentres} />
                 </div>
                 <Button onClick={convertLead} className="flex-1 gap-2">
                   Convert

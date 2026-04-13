@@ -14,24 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_phone_numbers: {
+        Row: {
+          created_at: string
+          id: string
+          is_whatsapp: boolean
+          label: string
+          phone_number: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_whatsapp?: boolean
+          label?: string
+          phone_number: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_whatsapp?: boolean
+          label?: string
+          phone_number?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       eye_centres: {
         Row: {
+          address: string
           city: string
           created_at: string
+          google_maps_url: string
           id: string
           name: string
           status: string
         }
         Insert: {
+          address?: string
           city?: string
           created_at?: string
+          google_maps_url?: string
           id?: string
           name: string
           status?: string
         }
         Update: {
+          address?: string
           city?: string
           created_at?: string
+          google_maps_url?: string
           id?: string
           name?: string
           status?: string
