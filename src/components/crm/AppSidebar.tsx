@@ -1,6 +1,6 @@
 import { 
   LayoutDashboard, Users, Phone, Calendar, BarChart3, Settings, LogOut, 
-  UserCircle, ChevronLeft, Menu, MessageCircle, Zap
+  UserCircle, ChevronLeft, Menu, MessageCircle, Zap, Plug
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +16,7 @@ const navItems = [
   { icon: BarChart3, label: 'Reports', path: '/reports', roles: ['admin', 'manager'] },
   { icon: MessageCircle, label: 'WA Templates', path: '/whatsapp-templates', roles: ['admin'] },
   { icon: Zap, label: 'WA Campaigns', path: '/wa-campaigns', roles: ['admin', 'manager'] },
+  { icon: Plug, label: 'Integrations', path: '/integrations', roles: ['admin'] },
   { icon: Settings, label: 'Settings', path: '/settings', roles: ['admin', 'manager'] },
 ];
 
