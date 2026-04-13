@@ -206,7 +206,9 @@ export default function LeadsPage() {
                     <TableHead className="text-xs min-w-[100px]">Status</TableHead>
                     <TableHead className="text-xs min-w-[100px]">Temperature</TableHead>
                     <TableHead className="text-xs min-w-[120px]">Source</TableHead>
-                    <TableHead className="text-xs min-w-[110px]">Owner</TableHead>
+                    <TableHead className="text-xs min-w-[110px]">First Owner</TableHead>
+                    <TableHead className="text-xs min-w-[110px]">Current Owner</TableHead>
+                    <TableHead className="text-xs min-w-[110px]">Conversion Owner</TableHead>
                     <TableHead className="text-xs min-w-[90px]">Created</TableHead>
                     <TableHead className="text-xs min-w-[60px]">Age</TableHead>
                     <TableHead className="text-xs min-w-[90px]">Follow-up</TableHead>
@@ -231,7 +233,9 @@ export default function LeadsPage() {
                       <TableCell><LeadStatusBadge status={lead.status} /></TableCell>
                       <TableCell><TemperatureBadge temperature={lead.temperature} /></TableCell>
                       <TableCell className="text-sm">{sourceLabels[lead.source] || lead.source}</TableCell>
+                      <TableCell className="text-sm">{agentMap.get(lead.first_owner_id) || '—'}</TableCell>
                       <TableCell className="text-sm">{agentMap.get(lead.current_owner_id) || '—'}</TableCell>
+                      <TableCell className="text-sm">{lead.conversion_owner_id ? agentMap.get(lead.conversion_owner_id) || '—' : '—'}</TableCell>
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(lead.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}
                       </TableCell>
