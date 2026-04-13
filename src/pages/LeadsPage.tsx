@@ -267,6 +267,32 @@ export default function LeadsPage() {
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(lead.updated_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}
                       </TableCell>
+                      <TableCell className="text-xs text-muted-foreground max-w-[250px]">
+                        {(() => {
+                          const history = ownershipMap.get(lead.id) || [];
+                          if (history.length === 0) return '—';
+                          return (
+                            <div className="flex flex-wrap gap-1">
+                              {history.map((h, i) => {
+                                const name = agentMap.get(h.owner_id) || 'Unknown';
+                                const isCurrent = !h.ended_at;
+                                return (
+                                  <span
+                                    key={i}
+                                    className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                      isCurrent
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'bg-muted text-muted-foreground'
+                                    }`}
+                                  >
+                                    {name}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
                       <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
                         {lead.notes || '—'}
                       </TableCell>
