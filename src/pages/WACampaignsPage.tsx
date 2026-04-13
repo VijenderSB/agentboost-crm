@@ -87,8 +87,8 @@ export default function WACampaignsPage() {
   const [campaignName, setCampaignName] = useState('');
   const [selectedAgent, setSelectedAgent] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState('');
-  const [selectedTemperatures, setSelectedTemperatures] = useState<Array<'warm' | 'cold' | 'success' | 'lost' | 'super_hot' | 'hot' | 'junk'>>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<Array<'fresh' | 'connected' | 'not_connected' | 'followup'>>([]);
+  const [selectedTemperatures, setSelectedTemperatures] = useState<TemperatureValue[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<StatusValue[]>([]);
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
   const [leadCount, setLeadCount] = useState<number | null>(null);
