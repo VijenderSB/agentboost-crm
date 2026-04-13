@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp, Shuffle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp, Shuffle, ChevronDown, ChevronUp, Mail } from 'lucide-react';
 import AppSidebar from '@/components/crm/AppSidebar';
 import AddAgentDialog from '@/components/crm/AddAgentDialog';
 import ReassignLeadsDialog from '@/components/crm/ReassignLeadsDialog';
+import EditAgentEmailDialog from '@/components/crm/EditAgentEmailDialog';
 import AgentPhoneSection from '@/components/crm/AgentPhoneSection';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +30,7 @@ export default function AgentsPage() {
   const [loading, setLoading] = useState(true);
   const [reshuffling, setReshuffling] = useState(false);
   const [reassignAgent, setReassignAgent] = useState<{ id: string; name: string } | null>(null);
+  const [editEmailAgent, setEditEmailAgent] = useState<{ id: string; name: string } | null>(null);
   const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
 
   const fetchAgents = async () => {
@@ -162,6 +164,15 @@ export default function AgentsPage() {
                       variant="outline"
                       size="sm"
                       className="gap-1.5"
+                      onClick={() => setEditEmailAgent({ id: agent.id, name: agent.name })}
+                    >
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
                       onClick={() => setReassignAgent({ id: agent.id, name: agent.name })}
                     >
                       <ArrowRightLeft className="w-4 h-4" />
@@ -253,6 +264,16 @@ export default function AgentsPage() {
             agentId={reassignAgent.id}
             agentName={reassignAgent.name}
             onDone={fetchAgents}
+          />
+        )}
+
+        {editEmailAgent && (
+          <EditAgentEmailDialog
+            open={!!editEmailAgent}
+            onOpenChange={open => !open && setEditEmailAgent(null)}
+            agentId={editEmailAgent.id}
+            agentName={editEmailAgent.name}
+            onUpdated={fetchAgents}
           />
         )}
       </main>
