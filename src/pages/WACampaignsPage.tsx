@@ -371,7 +371,7 @@ export default function WACampaignsPage() {
     setDetailMessages((data as CampaignMessage[]) || []);
   };
 
-  const toggleFilter = (value: string, list: string[], setter: (v: string[]) => void) => {
+  const toggleFilter = <T extends string>(value: T, list: T[], setter: (v: T[]) => void) => {
     setter(list.includes(value) ? list.filter(v => v !== value) : [...list, value]);
     setLeadCount(null);
   };
