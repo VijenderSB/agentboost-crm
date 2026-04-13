@@ -227,6 +227,7 @@ export default function LeadsPage() {
                     <TableHead className="text-xs min-w-[60px]">Age</TableHead>
                     <TableHead className="text-xs min-w-[90px]">Follow-up</TableHead>
                     <TableHead className="text-xs min-w-[90px]">Updated</TableHead>
+                    <TableHead className="text-xs min-w-[200px]">Ownership History</TableHead>
                     <TableHead className="text-xs min-w-[150px]">Notes</TableHead>
                   </TableRow>
                 </TableHeader>
