@@ -119,6 +119,41 @@ export type Database = {
           },
         ]
       }
+      lead_ownership_history: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          lead_id: string
+          owner_id: string
+          started_at: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          lead_id: string
+          owner_id: string
+          started_at?: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          lead_id?: string
+          owner_id?: string
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_ownership_history_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_references: {
         Row: {
           created_at: string

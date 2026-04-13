@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Phone, MessageCircle, ArrowLeft, Clock, MapPin, Globe, PhoneCall } from 'lucide-react';
 import LeadTimeline from '@/components/crm/LeadTimeline';
+import OwnershipHistory from '@/components/crm/OwnershipHistory';
 import WhatsAppTemplates from '@/components/crm/WhatsAppTemplates';
 import AppSidebar from '@/components/crm/AppSidebar';
 import { LeadStatusBadge, TemperatureBadge } from '@/components/crm/StatusBadge';
@@ -287,10 +288,18 @@ export default function LeadDetailPage() {
             </div>
           </div>
 
-          {/* Activity Timeline (Comment History) */}
-          <div className="bg-card rounded-xl border border-border p-5">
-            <h3 className="font-semibold mb-4">Activity & Comment History</h3>
-            <LeadTimeline leadId={id!} />
+          <div className="space-y-4">
+            {/* Ownership History */}
+            <div className="bg-card rounded-xl border border-border p-5">
+              <h3 className="font-semibold mb-4">Ownership History</h3>
+              <OwnershipHistory leadId={id!} />
+            </div>
+
+            {/* Activity Timeline (Comment History) */}
+            <div className="bg-card rounded-xl border border-border p-5">
+              <h3 className="font-semibold mb-4">Activity & Comment History</h3>
+              <LeadTimeline leadId={id!} />
+            </div>
           </div>
         </div>
       </main>
