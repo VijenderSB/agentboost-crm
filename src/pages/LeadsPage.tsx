@@ -14,11 +14,13 @@ import { Constants } from '@/integrations/supabase/types';
 import type { Lead } from '@/types/crm';
 
 interface Agent { id: string; name: string; }
+interface OwnershipEntry { lead_id: string; owner_id: string; started_at: string; ended_at: string | null; }
 
 export default function LeadsPage() {
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [ownershipMap, setOwnershipMap] = useState<Map<string, OwnershipEntry[]>>(new Map());
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
