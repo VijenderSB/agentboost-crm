@@ -212,7 +212,7 @@ curl -X POST '${WEBHOOK_URL}' \\
           <Card className="mb-4">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-green-600" /> WhatsApp (+918800770952)
+                <MessageCircle className="h-5 w-5 text-primary" /> WhatsApp (+918800770952)
               </CardTitle>
               <CardDescription>Capture leads from WhatsApp conversations</CardDescription>
             </CardHeader>
@@ -225,7 +225,7 @@ curl -X POST '${WEBHOOK_URL}' \\
           <Card className="mb-4">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-blue-600" /> Tawk.to Chat
+                <MessageSquare className="h-5 w-5 text-primary" /> Tawk.to Chat
               </CardTitle>
               <CardDescription>Auto-capture leads when visitors chat on your websites</CardDescription>
             </CardHeader>
@@ -238,7 +238,7 @@ curl -X POST '${WEBHOOK_URL}' \\
           <Card className="mb-4">
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Phone className="h-5 w-5 text-orange-600" /> IVR / Calling
+                <Phone className="h-5 w-5 text-primary" /> IVR / Calling
               </CardTitle>
               <CardDescription>Capture leads from phone calls via your IVR provider</CardDescription>
             </CardHeader>
