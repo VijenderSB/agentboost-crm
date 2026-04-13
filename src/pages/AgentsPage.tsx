@@ -141,8 +141,8 @@ export default function AgentsPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="agent">Agent</SelectItem>
-                            <SelectItem value="manager">Manager</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="manager">Admin</SelectItem>
+                            <SelectItem value="admin">Super Admin</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
