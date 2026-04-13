@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Phone, MessageCircle, ArrowLeft, Clock, MapPin, Globe } from 'lucide-react';
+import { Phone, MessageCircle, ArrowLeft, Clock, MapPin, Globe, PhoneCall } from 'lucide-react';
 import LeadTimeline from '@/components/crm/LeadTimeline';
 import WhatsAppTemplates from '@/components/crm/WhatsAppTemplates';
 import AppSidebar from '@/components/crm/AppSidebar';
@@ -8,6 +8,7 @@ import { LeadStatusBadge, TemperatureBadge } from '@/components/crm/StatusBadge'
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,14 +22,23 @@ export default function LeadDetailPage() {
   const [lead, setLead] = useState<Lead | null>(null);
   const [activities, setActivities] = useState<LeadActivity[]>([]);
   const [agentName, setAgentName] = useState('');
-  const [note, setNote] = useState('');
+  const [comment, setComment] = useState('');
+  const [altMobile, setAltMobile] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const isAdmin = user?.role === 'admin';
+  const isManager = user?.role === 'manager';
+  const canEditAll = isAdmin || isManager;
 
   const fetchLead = async () => {
     if (!id) return;
     const { data } = await supabase.from('leads').select('*').eq('id', id).single();
-    if (data) setLead(data as unknown as Lead);
-    
+    if (data) {
+      const leadData = data as unknown as Lead;
+      setLead(leadData);
+      setAltMobile((leadData as any).alternative_mobile || '');
+    }
+
     const { data: acts } = await supabase.from('lead_activities').select('*').eq('lead_id', id).order('created_at', { ascending: false });
     if (acts) setActivities(acts as unknown as LeadActivity[]);
     setLoading(false);
@@ -43,12 +53,11 @@ export default function LeadDetailPage() {
     });
   }, [user]);
 
-  const updateLead = async (updates: Partial<Lead>) => {
+  const updateLead = async (updates: Partial<Lead> & { alternative_mobile?: string }) => {
     if (!id) return;
     const { error } = await supabase.from('leads').update(updates as any).eq('id', id);
     if (error) { toast.error(error.message); return; }
-    
-    // Log activity
+
     if (user) {
       const activityType = Object.keys(updates).join(', ') + ' updated';
       await supabase.from('lead_activities').insert({
@@ -58,22 +67,27 @@ export default function LeadDetailPage() {
         remarks: `Updated to: ${JSON.stringify(updates)}`,
       });
     }
-    
+
     toast.success('Lead updated');
     fetchLead();
   };
 
-  const addNote = async () => {
-    if (!note.trim() || !user || !id) return;
+  const addComment = async () => {
+    if (!comment.trim() || !user || !id) return;
     await supabase.from('lead_activities').insert({
       lead_id: id,
       user_id: user.id,
-      activity_type: 'note',
-      remarks: note.trim(),
+      activity_type: 'comment',
+      remarks: comment.trim(),
     });
-    setNote('');
-    toast.success('Note added');
+    setComment('');
+    toast.success('Comment added');
     fetchLead();
+  };
+
+  const saveAltMobile = async () => {
+    if (!id) return;
+    await updateLead({ alternative_mobile: altMobile.trim() } as any);
   };
 
   const convertLead = async () => {
@@ -100,20 +114,24 @@ export default function LeadDetailPage() {
     <div className="flex min-h-screen bg-background">
       <AppSidebar />
       <main className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6 overflow-auto">
-        {/* Header */}
         <button onClick={() => navigate(-1)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Main Info */}
           <div className="lg:col-span-2 space-y-4">
+            {/* Lead Info Card */}
             <div className="bg-card rounded-xl border border-border p-5">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h1 className="text-xl font-bold">{lead.name || 'Unknown'}</h1>
                   <p className="text-muted-foreground">{lead.mobile}</p>
+                  {(lead as any).alternative_mobile && (
+                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <PhoneCall className="w-3.5 h-3.5" /> Alt: {(lead as any).alternative_mobile}
+                    </p>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <LeadStatusBadge status={lead.status} />
@@ -149,6 +167,13 @@ export default function LeadDetailPage() {
                     <Phone className="w-4 h-4" /> Call
                   </Button>
                 </a>
+                {(lead as any).alternative_mobile && (
+                  <a href={`tel:${(lead as any).alternative_mobile}`} className="flex-1">
+                    <Button variant="outline" className="w-full gap-2 text-success border-success/30 hover:bg-success/10">
+                      <PhoneCall className="w-4 h-4" /> Call Alt
+                    </Button>
+                  </a>
+                )}
                 <div className="flex-1">
                   <WhatsAppTemplates lead={lead} agentName={agentName} />
                 </div>
@@ -158,7 +183,7 @@ export default function LeadDetailPage() {
               </div>
             </div>
 
-            {/* Update Status/Temperature */}
+            {/* Update Status/Temperature - All roles can do this */}
             <div className="bg-card rounded-xl border border-border p-5">
               <h3 className="font-semibold mb-3">Update Lead</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -192,19 +217,79 @@ export default function LeadDetailPage() {
               </div>
             </div>
 
-            {/* Add Note */}
+            {/* Alternative Mobile - All roles can add */}
             <div className="bg-card rounded-xl border border-border p-5">
-              <h3 className="font-semibold mb-3">Add Note</h3>
+              <h3 className="font-semibold mb-3">Alternative Number</h3>
               <div className="flex gap-2">
-                <Input value={note} onChange={e => setNote(e.target.value)} placeholder="Write a note..." className="flex-1" />
-                <Button onClick={addNote} disabled={!note.trim()}>Add</Button>
+                <Input
+                  value={altMobile}
+                  onChange={e => setAltMobile(e.target.value)}
+                  placeholder="Enter alternative mobile number..."
+                  className="flex-1"
+                />
+                <Button onClick={saveAltMobile} disabled={altMobile === ((lead as any).alternative_mobile || '')}>
+                  Save
+                </Button>
+              </div>
+            </div>
+
+            {/* Edit Lead Details - Only Admin/Manager */}
+            {canEditAll && (
+              <div className="bg-card rounded-xl border border-border p-5">
+                <h3 className="font-semibold mb-3">Edit Lead Details</h3>
+                <p className="text-xs text-muted-foreground mb-3">Only Super Admin & Admin can edit these fields</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <Label>Name</Label>
+                    <Input
+                      defaultValue={lead.name}
+                      onBlur={e => {
+                        if (e.target.value !== lead.name) updateLead({ name: e.target.value });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label>Mobile</Label>
+                    <Input
+                      defaultValue={lead.mobile}
+                      onBlur={e => {
+                        if (e.target.value !== lead.mobile) updateLead({ mobile: e.target.value });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label>City</Label>
+                    <Input
+                      defaultValue={lead.city}
+                      onBlur={e => {
+                        if (e.target.value !== lead.city) updateLead({ city: e.target.value });
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Add Comment */}
+            <div className="bg-card rounded-xl border border-border p-5">
+              <h3 className="font-semibold mb-3">Add Comment</h3>
+              <div className="space-y-2">
+                <Textarea
+                  value={comment}
+                  onChange={e => setComment(e.target.value)}
+                  placeholder="Write a comment about this lead..."
+                  rows={3}
+                />
+                <Button onClick={addComment} disabled={!comment.trim()}>
+                  Add Comment
+                </Button>
               </div>
             </div>
           </div>
 
-          {/* Activity Timeline */}
+          {/* Activity Timeline (Comment History) */}
           <div className="bg-card rounded-xl border border-border p-5">
-            <h3 className="font-semibold mb-4">Activity Timeline</h3>
+            <h3 className="font-semibold mb-4">Activity & Comment History</h3>
             <LeadTimeline leadId={id!} />
           </div>
         </div>
