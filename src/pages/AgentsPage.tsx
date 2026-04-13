@@ -224,6 +224,23 @@ export default function AgentsPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Phone Numbers - Super Admin only */}
+                {user?.role === 'admin' && (
+                  <div className="mt-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 text-xs text-muted-foreground"
+                      onClick={() => setExpandedAgent(expandedAgent === agent.id ? null : agent.id)}
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      Manage Phone Numbers
+                      {expandedAgent === agent.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </Button>
+                    {expandedAgent === agent.id && <AgentPhoneSection agentId={agent.id} />}
+                  </div>
+                )}
               </div>
             ))}
           </div>
