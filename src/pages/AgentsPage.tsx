@@ -164,6 +164,15 @@ export default function AgentsPage() {
                       variant="outline"
                       size="sm"
                       className="gap-1.5"
+                      onClick={() => setEditEmailAgent({ id: agent.id, name: agent.name })}
+                    >
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
                       onClick={() => setReassignAgent({ id: agent.id, name: agent.name })}
                     >
                       <ArrowRightLeft className="w-4 h-4" />
@@ -255,6 +264,16 @@ export default function AgentsPage() {
             agentId={reassignAgent.id}
             agentName={reassignAgent.name}
             onDone={fetchAgents}
+          />
+        )}
+
+        {editEmailAgent && (
+          <EditAgentEmailDialog
+            open={!!editEmailAgent}
+            onOpenChange={open => !open && setEditEmailAgent(null)}
+            agentId={editEmailAgent.id}
+            agentName={editEmailAgent.name}
+            onUpdated={fetchAgents}
           />
         )}
       </main>
