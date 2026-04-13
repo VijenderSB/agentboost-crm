@@ -678,11 +678,11 @@ export default function WACampaignsPage() {
                     <p className="text-2xl font-bold">{detailCampaign?.total_leads}</p>
                     <p className="text-xs text-muted-foreground">Total</p>
                   </div>
-                  <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-                    <p className="text-2xl font-bold text-green-600">{detailCampaign?.messages_sent}</p>
+                  <div className="bg-primary/10 rounded-lg p-3">
+                    <p className="text-2xl font-bold text-primary">{detailCampaign?.messages_sent}</p>
                     <p className="text-xs text-muted-foreground">Sent</p>
                   </div>
-                  <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+                  <div className="bg-destructive/10 rounded-lg p-3">
                     <p className="text-2xl font-bold text-destructive">{detailCampaign?.messages_failed}</p>
                     <p className="text-xs text-muted-foreground">Failed</p>
                   </div>
