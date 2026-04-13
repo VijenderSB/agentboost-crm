@@ -1,6 +1,6 @@
 import { 
   LayoutDashboard, Users, Phone, Calendar, BarChart3, Settings, LogOut, 
-  UserCircle, ChevronLeft, Menu
+  UserCircle, ChevronLeft, Menu, MessageCircle
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,7 @@ const navItems = [
   { icon: Calendar, label: 'Follow-ups', path: '/followups', roles: ['admin', 'manager', 'agent'] },
   { icon: Phone, label: 'Agents', path: '/agents', roles: ['admin', 'manager'] },
   { icon: BarChart3, label: 'Reports', path: '/reports', roles: ['admin', 'manager'] },
+  { icon: MessageCircle, label: 'WA Templates', path: '/whatsapp-templates', roles: ['admin'] },
   { icon: Settings, label: 'Settings', path: '/settings', roles: ['admin', 'manager'] },
 ];
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageCircle, Send, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
 import type { Lead } from '@/types/crm';
 
 export interface EyeCentreInfo {
@@ -22,69 +23,10 @@ export interface EyeCentreInfo {
 
 interface Template {
   id: string;
-  label: string;
+  name: string;
   category: string;
   message: string;
 }
-
-const baseTemplates: Template[] = [
-  {
-    id: 'intro',
-    label: 'Introduction',
-    category: 'First Contact',
-    message: `Hi {{name}}, this is {{agent}} from our team. Thank you for your interest! I'd love to help you with any questions. When would be a good time to connect?`,
-  },
-  {
-    id: 'eye_centre_referral',
-    label: 'Eye Centre Referral',
-    category: 'First Contact',
-    message: `Hi {{name}}, this is {{agent}}. Thank you for your interest in Lasik surgery! 🏥
-
-We have scheduled your consultation at:
-
-*{{eye_centre_name}}*
-📍 {{eye_centre_address}}
-📌 Location: {{eye_centre_maps}}
-
-Please visit the centre at your convenience. Feel free to reach out if you need any assistance!`,
-  },
-  {
-    id: 'followup_1',
-    label: 'First Follow-up',
-    category: 'Follow-up',
-    message: `Hi {{name}}, just following up on our earlier conversation. Have you had a chance to think about it? Happy to assist with any queries.`,
-  },
-  {
-    id: 'followup_2',
-    label: 'Gentle Reminder',
-    category: 'Follow-up',
-    message: `Hey {{name}}, hope you're doing well! Just a quick reminder about our discussion. Let me know if you'd like to proceed or need more information.`,
-  },
-  {
-    id: 'not_connected',
-    label: 'Missed Call',
-    category: 'Not Connected',
-    message: `Hi {{name}}, I tried reaching you but couldn't connect. Could you please let me know a convenient time to call? Looking forward to speaking with you.`,
-  },
-  {
-    id: 'offer',
-    label: 'Special Offer',
-    category: 'Promotion',
-    message: `Hi {{name}}! We have an exclusive offer running right now that I think you'd be interested in. Would you like to know more details?`,
-  },
-  {
-    id: 'thank_you',
-    label: 'Thank You',
-    category: 'Post-Conversion',
-    message: `Hi {{name}}, thank you so much for choosing us! We truly appreciate your trust. If you need anything or know someone who could benefit from our services, feel free to reach out anytime.`,
-  },
-  {
-    id: 'reference',
-    label: 'Ask for Reference',
-    category: 'Post-Conversion',
-    message: `Hi {{name}}, hope you're happy with our service! If you know anyone who might benefit, we'd really appreciate a referral. Thank you!`,
-  },
-];
 
 interface Props {
   lead: Lead;
@@ -96,26 +38,28 @@ export default function WhatsAppTemplates({ lead, agentName = 'your agent', eyeC
   const [previewOpen, setPreviewOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [editedMessage, setEditedMessage] = useState('');
+  const [templates, setTemplates] = useState<Template[]>([]);
 
-  // Build dynamic eye centre referral templates if multiple centres
-  const templates: Template[] = [...baseTemplates];
+  useEffect(() => {
+    supabase
+      .from('whatsapp_templates')
+      .select('id, name, category, message')
+      .eq('is_active', true)
+      .order('sort_order')
+      .then(({ data }) => {
+        if (data) setTemplates(data as Template[]);
+      });
+  }, []);
 
-  // If lead has multiple eye centres, add one template per centre
+  // Add per-eye-centre referral templates dynamically
+  const allTemplates: Template[] = [...templates];
   if (eyeCentres.length > 1) {
     eyeCentres.forEach((ec, i) => {
-      templates.push({
-        id: `eye_centre_referral_${i}`,
-        label: `Refer to ${ec.name}`,
+      allTemplates.push({
+        id: `ec_dynamic_${i}`,
+        name: `Refer to ${ec.name}`,
         category: 'Eye Centre Referral',
-        message: `Hi {{name}}, this is {{agent}}. Thank you for your interest in Lasik surgery! 🏥
-
-We have scheduled your consultation at:
-
-*${ec.name}*
-📍 ${ec.address || ec.city}
-📌 Location: ${ec.google_maps_url || 'Will be shared'}
-
-Please visit the centre at your convenience. Feel free to reach out if you need any assistance!`,
+        message: `Hi {{name}}, this is {{agent}}. Thank you for your interest in Lasik surgery! 🏥\n\nWe have scheduled your consultation at:\n\n*${ec.name}*\n📍 ${ec.address || ec.city}\n📌 Location: ${ec.google_maps_url || 'Will be shared'}\n\nPlease visit the centre at your convenience. Feel free to reach out if you need any assistance!`,
       });
     });
   }
@@ -125,7 +69,6 @@ Please visit the centre at your convenience. Feel free to reach out if you need 
       .replace(/\{\{name\}\}/g, lead.name || 'there')
       .replace(/\{\{agent\}\}/g, agentName);
 
-    // Fill eye centre placeholders with first centre if available
     if (eyeCentres.length > 0) {
       const ec = eyeCentres[0];
       filled = filled
@@ -138,7 +81,6 @@ Please visit the centre at your convenience. Feel free to reach out if you need 
         .replace(/\{\{eye_centre_address\}\}/g, '[Address]')
         .replace(/\{\{eye_centre_maps\}\}/g, '[Map Link]');
     }
-
     return filled;
   };
 
@@ -155,7 +97,7 @@ Please visit the centre at your convenience. Feel free to reach out if you need 
     setPreviewOpen(false);
   };
 
-  const categories = [...new Set(templates.map(t => t.category))];
+  const categories = [...new Set(allTemplates.map(t => t.category))];
 
   return (
     <>
@@ -178,10 +120,10 @@ Please visit the centre at your convenience. Feel free to reach out if you need 
           {categories.map(cat => (
             <div key={cat}>
               <DropdownMenuLabel className="text-xs text-muted-foreground">{cat}</DropdownMenuLabel>
-              {templates.filter(t => t.category === cat).map(t => (
+              {allTemplates.filter(t => t.category === cat).map(t => (
                 <DropdownMenuItem key={t.id} onClick={() => openPreview(t)}>
                   <Send className="w-3.5 h-3.5 mr-2" />
-                  {t.label}
+                  {t.name}
                 </DropdownMenuItem>
               ))}
             </div>
@@ -194,7 +136,7 @@ Please visit the centre at your convenience. Feel free to reach out if you need 
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-green-600" />
-              {selectedTemplate?.label}
+              {selectedTemplate?.name}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
