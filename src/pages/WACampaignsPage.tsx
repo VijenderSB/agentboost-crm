@@ -62,14 +62,17 @@ interface Template {
   message: string;
 }
 
-const TEMPERATURE_OPTIONS = [
+type TemperatureValue = 'warm' | 'cold' | 'success' | 'lost' | 'super_hot' | 'hot' | 'junk';
+type StatusValue = 'fresh' | 'connected' | 'not_connected' | 'followup';
+
+const TEMPERATURE_OPTIONS: { value: TemperatureValue; label: string }[] = [
   { value: 'warm', label: 'Warm' },
   { value: 'cold', label: 'Cold' },
   { value: 'success', label: 'Success (Referral)' },
   { value: 'lost', label: 'Lost (Referral)' },
 ];
 
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS: { value: StatusValue; label: string }[] = [
   { value: 'not_connected', label: 'Not Connected' },
   { value: 'fresh', label: 'Fresh' },
   { value: 'connected', label: 'Connected' },
