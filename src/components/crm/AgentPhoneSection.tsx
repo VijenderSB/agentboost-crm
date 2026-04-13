@@ -92,13 +92,13 @@ export default function AgentPhoneSection({ agentId }: Props) {
                     <Badge variant="outline" className="text-xs">{ph.label}</Badge>
                     {ph.is_whatsapp && (
                       <Badge className="text-xs bg-green-500/10 text-green-600 border-green-500/20">
-                        <MessageCircle className="w-3 h-3 mr-1" />WA
+                        <MessageCircle className="w-3 h-3 mr-1" />WhatsApp
                       </Badge>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-muted-foreground">WA</span>
+                      <span className="text-xs text-muted-foreground">WhatsApp</span>
                       <Switch checked={ph.is_whatsapp} onCheckedChange={() => toggleWhatsApp(ph.id, ph.is_whatsapp)} />
                     </div>
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(ph.id)}>
@@ -128,7 +128,7 @@ export default function AgentPhoneSection({ agentId }: Props) {
                 checked={form.is_whatsapp}
                 onCheckedChange={v => setForm(f => ({ ...f, is_whatsapp: v }))}
               />
-              <span className="text-xs text-muted-foreground">WA</span>
+              <span className="text-xs text-muted-foreground">WhatsApp</span>
             </div>
             <Button size="sm" className="gap-1 h-8" onClick={handleAdd} disabled={adding}>
               <Plus className="w-3.5 h-3.5" />
