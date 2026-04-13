@@ -110,7 +110,7 @@ export default function AgentsPage() {
                 const { data, error } = await supabase.rpc('reshuffle_leads', { _triggered_by: user.id });
                 setReshuffling(false);
                 if (error) { toast.error(error.message); return; }
-                toast.success(`${data} warm/cold lead(s) reshuffled across agents`);
+                toast.success(`${data} warm/cold lead(s) older than 30 days reshuffled across other agents`);
                 fetchAgents();
               }}
             >
