@@ -263,6 +263,21 @@ export default function LeadsPage() {
                       <TableCell><LeadStatusBadge status={lead.status} /></TableCell>
                       <TableCell><TemperatureBadge temperature={lead.temperature} /></TableCell>
                       <TableCell className="text-sm">{sourceLabels[lead.source] || lead.source}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground max-w-[200px]">
+                        {(() => {
+                          const centres = eyeCentreMap.get(lead.id) || [];
+                          if (centres.length === 0) return '—';
+                          return (
+                            <div className="flex flex-wrap gap-1">
+                              {centres.map((name, i) => (
+                                <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-accent text-accent-foreground">
+                                  {name}
+                                </span>
+                              ))}
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
                       <TableCell className="text-sm">{agentMap.get(lead.first_owner_id) || '—'}</TableCell>
                       <TableCell className="text-sm">{agentMap.get(lead.current_owner_id) || '—'}</TableCell>
                       <TableCell className="text-sm">{lead.conversion_owner_id ? agentMap.get(lead.conversion_owner_id) || '—' : '—'}</TableCell>
@@ -304,21 +319,6 @@ export default function LeadsPage() {
                                   </span>
                                 );
                               })}
-                            </div>
-                          );
-                        })()}
-                      </TableCell>
-                      <TableCell className="text-xs text-muted-foreground max-w-[200px]">
-                        {(() => {
-                          const centres = eyeCentreMap.get(lead.id) || [];
-                          if (centres.length === 0) return '—';
-                          return (
-                            <div className="flex flex-wrap gap-1">
-                              {centres.map((name, i) => (
-                                <span key={i} className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-accent text-accent-foreground">
-                                  {name}
-                                </span>
-                              ))}
                             </div>
                           );
                         })()}
