@@ -752,7 +752,7 @@ function CampaignStatusBadge({ status }: { status: string }) {
 }
 
 function MessageStatusBadge({ status }: { status: string }) {
-  if (status === 'sent') return <Badge variant="default" className="text-xs bg-green-600">Sent</Badge>;
+  if (status === 'sent') return <Badge variant="default" className="text-xs">Sent</Badge>;
   if (status === 'failed') return <Badge variant="destructive" className="text-xs">Failed</Badge>;
   if (status === 'skipped') return <Badge variant="outline" className="text-xs">Skipped</Badge>;
   return <Badge variant="secondary" className="text-xs">Pending</Badge>;
