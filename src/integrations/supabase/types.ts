@@ -153,6 +153,7 @@ export type Database = {
       }
       leads: {
         Row: {
+          alternative_mobile: string | null
           city: string
           conversion_owner_id: string | null
           created_at: string
@@ -171,6 +172,7 @@ export type Database = {
           website_name: string | null
         }
         Insert: {
+          alternative_mobile?: string | null
           city?: string
           conversion_owner_id?: string | null
           created_at?: string
@@ -189,6 +191,7 @@ export type Database = {
           website_name?: string | null
         }
         Update: {
+          alternative_mobile?: string | null
           city?: string
           conversion_owner_id?: string | null
           created_at?: string
