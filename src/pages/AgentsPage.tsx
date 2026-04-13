@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp, Shuffle } from 'lucide-react';
+import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp, Shuffle, ChevronDown, ChevronUp } from 'lucide-react';
 import AppSidebar from '@/components/crm/AppSidebar';
 import AddAgentDialog from '@/components/crm/AddAgentDialog';
 import ReassignLeadsDialog from '@/components/crm/ReassignLeadsDialog';
+import AgentPhoneSection from '@/components/crm/AgentPhoneSection';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
