@@ -4,6 +4,7 @@ import { Phone, MessageCircle, ArrowLeft, Clock, MapPin, Globe, PhoneCall } from
 import LeadTimeline from '@/components/crm/LeadTimeline';
 import OwnershipHistory from '@/components/crm/OwnershipHistory';
 import WhatsAppTemplates from '@/components/crm/WhatsAppTemplates';
+import LeadEyeCentres from '@/components/crm/LeadEyeCentres';
 import AppSidebar from '@/components/crm/AppSidebar';
 import { LeadStatusBadge, TemperatureBadge } from '@/components/crm/StatusBadge';
 import { Button } from '@/components/ui/button';
@@ -289,6 +290,9 @@ export default function LeadDetailPage() {
           </div>
 
           <div className="space-y-4">
+            {/* Eye Centres */}
+            <LeadEyeCentres leadId={id!} />
+
             {/* Ownership History */}
             <div className="bg-card rounded-xl border border-border p-5">
               <h3 className="font-semibold mb-4">Ownership History</h3>

@@ -1,4 +1,5 @@
 import AppSidebar from '@/components/crm/AppSidebar';
+import EyeCentreManager from '@/components/crm/EyeCentreManager';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -41,10 +42,12 @@ export default function SettingsPage() {
             <Label>Role</Label>
             <Input value={user?.role || ''} disabled className="capitalize" />
           </div>
-          <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving}>
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
+
+        <EyeCentreManager />
       </main>
     </div>
   );
