@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, LayoutGrid, Table as TableIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AppSidebar from '@/components/crm/AppSidebar';
 import LeadCard from '@/components/crm/LeadCard';
 import AddLeadDialog from '@/components/crm/AddLeadDialog';
+import { LeadStatusBadge, TemperatureBadge } from '@/components/crm/StatusBadge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { Constants } from '@/integrations/supabase/types';
 import type { Lead } from '@/types/crm';
@@ -13,10 +16,12 @@ import type { Lead } from '@/types/crm';
 interface Agent { id: string; name: string; }
 
 export default function LeadsPage() {
+  const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [tempFilter, setTempFilter] = useState<string>('all');
   const [sourceFilter, setSourceFilter] = useState<string>('all');
@@ -70,13 +75,42 @@ export default function LeadsPage() {
     whatsapp_ads: 'WhatsApp Ads', reference: 'Reference', walkin: 'Walk-in', manual: 'Manual',
   };
 
+  const agentMap = new Map(agents.map(a => [a.id, a.name]));
+
+  const daysSince = (date: string) => {
+    const diff = Date.now() - new Date(date).getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  };
+
   return (
     <div className="flex min-h-screen bg-background">
       <AppSidebar />
       <main className="flex-1 p-4 lg:p-6 pt-16 lg:pt-6 overflow-auto">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Leads</h1>
-          <AddLeadDialog />
+          <div className="flex items-center gap-2">
+            <div className="flex bg-muted rounded-lg p-0.5">
+              <Button
+                variant={viewMode === 'cards' ? 'default' : 'ghost'}
+                size="sm"
+                className="h-8 px-3 gap-1.5"
+                onClick={() => setViewMode('cards')}
+              >
+                <LayoutGrid className="w-4 h-4" />
+                <span className="hidden sm:inline">Cards</span>
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                size="sm"
+                className="h-8 px-3 gap-1.5"
+                onClick={() => setViewMode('table')}
+              >
+                <TableIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Matrix</span>
+              </Button>
+            </div>
+            <AddLeadDialog />
+          </div>
         </div>
 
         {/* Search + Filters */}
@@ -152,11 +186,76 @@ export default function LeadsPage() {
             <p className="text-lg font-medium">No leads found</p>
             <p className="text-sm mt-1">Try adjusting your filters</p>
           </div>
-        ) : (
+        ) : viewMode === 'cards' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {leads.map(lead => (
               <LeadCard key={lead.id} lead={lead} />
             ))}
+          </div>
+        ) : (
+          <div className="bg-card rounded-xl border border-border overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[40px] text-xs">#</TableHead>
+                    <TableHead className="text-xs min-w-[140px]">Name</TableHead>
+                    <TableHead className="text-xs min-w-[110px]">Mobile</TableHead>
+                    <TableHead className="text-xs min-w-[110px]">Alt Mobile</TableHead>
+                    <TableHead className="text-xs min-w-[100px]">City</TableHead>
+                    <TableHead className="text-xs min-w-[100px]">Status</TableHead>
+                    <TableHead className="text-xs min-w-[100px]">Temperature</TableHead>
+                    <TableHead className="text-xs min-w-[120px]">Source</TableHead>
+                    <TableHead className="text-xs min-w-[110px]">Owner</TableHead>
+                    <TableHead className="text-xs min-w-[90px]">Created</TableHead>
+                    <TableHead className="text-xs min-w-[60px]">Age</TableHead>
+                    <TableHead className="text-xs min-w-[90px]">Follow-up</TableHead>
+                    <TableHead className="text-xs min-w-[90px]">Updated</TableHead>
+                    <TableHead className="text-xs min-w-[150px]">Notes</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {leads.map((lead, idx) => (
+                    <TableRow
+                      key={lead.id}
+                      className="cursor-pointer hover:bg-muted/30 transition-colors"
+                      onClick={() => navigate(`/leads/${lead.id}`)}
+                    >
+                      <TableCell className="text-xs text-muted-foreground">{idx + 1}</TableCell>
+                      <TableCell className="text-sm font-medium">{lead.name || '—'}</TableCell>
+                      <TableCell className="text-sm font-mono">{lead.mobile}</TableCell>
+                      <TableCell className="text-sm font-mono text-muted-foreground">
+                        {(lead as any).alternative_mobile || '—'}
+                      </TableCell>
+                      <TableCell className="text-sm">{lead.city || '—'}</TableCell>
+                      <TableCell><LeadStatusBadge status={lead.status} /></TableCell>
+                      <TableCell><TemperatureBadge temperature={lead.temperature} /></TableCell>
+                      <TableCell className="text-sm">{sourceLabels[lead.source] || lead.source}</TableCell>
+                      <TableCell className="text-sm">{agentMap.get(lead.current_owner_id) || '—'}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(lead.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        <span className={`font-medium ${daysSince(lead.created_at) > 30 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                          {daysSince(lead.created_at)}d
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                        {lead.followup_date
+                          ? new Date(lead.followup_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })
+                          : '—'}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(lead.updated_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
+                        {lead.notes || '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
       </main>
