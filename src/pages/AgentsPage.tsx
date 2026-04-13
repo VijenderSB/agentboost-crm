@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp, Shuffle } from 'lucide-react';
+import { Users, ArrowRightLeft, Phone, CheckCircle, TrendingUp, Shuffle, ChevronDown, ChevronUp } from 'lucide-react';
 import AppSidebar from '@/components/crm/AppSidebar';
 import AddAgentDialog from '@/components/crm/AddAgentDialog';
 import ReassignLeadsDialog from '@/components/crm/ReassignLeadsDialog';
+import AgentPhoneSection from '@/components/crm/AgentPhoneSection';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -28,6 +29,7 @@ export default function AgentsPage() {
   const [loading, setLoading] = useState(true);
   const [reshuffling, setReshuffling] = useState(false);
   const [reassignAgent, setReassignAgent] = useState<{ id: string; name: string } | null>(null);
+  const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
 
   const fetchAgents = async () => {
     setLoading(true);
@@ -220,6 +222,23 @@ export default function AgentsPage() {
                         style={{ width: `${Math.min((agent.conversions / agent.totalLeads) * 100, 100)}%` }}
                       />
                     </div>
+                  </div>
+                )}
+
+                {/* Phone Numbers - Super Admin only */}
+                {user?.role === 'admin' && (
+                  <div className="mt-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 text-xs text-muted-foreground"
+                      onClick={() => setExpandedAgent(expandedAgent === agent.id ? null : agent.id)}
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      Manage Phone Numbers
+                      {expandedAgent === agent.id ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </Button>
+                    {expandedAgent === agent.id && <AgentPhoneSection agentId={agent.id} />}
                   </div>
                 )}
               </div>
