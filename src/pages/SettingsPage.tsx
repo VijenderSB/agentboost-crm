@@ -1,5 +1,6 @@
 import AppSidebar from '@/components/crm/AppSidebar';
 import EyeCentreManager from '@/components/crm/EyeCentreManager';
+import AgentPhoneManager from '@/components/crm/AgentPhoneManager';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -47,6 +48,7 @@ export default function SettingsPage() {
           </Button>
         </div>
 
+        <AgentPhoneManager />
         <EyeCentreManager />
       </main>
     </div>
