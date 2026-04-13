@@ -14,11 +14,13 @@ import { Constants } from '@/integrations/supabase/types';
 import type { Lead } from '@/types/crm';
 
 interface Agent { id: string; name: string; }
+interface OwnershipEntry { lead_id: string; owner_id: string; started_at: string; ended_at: string | null; }
 
 export default function LeadsPage() {
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
+  const [ownershipMap, setOwnershipMap] = useState<Map<string, OwnershipEntry[]>>(new Map());
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
@@ -42,7 +44,10 @@ export default function LeadsPage() {
     if (sourceFilter !== 'all') query = query.eq('source', sourceFilter as any);
     if (agentFilter !== 'all') query = query.eq('current_owner_id', agentFilter);
 
-    const { data } = await query;
+    const [{ data }, { data: historyData }] = await Promise.all([
+      query,
+      supabase.from('lead_ownership_history').select('lead_id, owner_id, started_at, ended_at').order('started_at', { ascending: true }),
+    ]);
     let filtered = (data as unknown as Lead[]) || [];
 
     if (search.trim()) {
@@ -51,6 +56,15 @@ export default function LeadsPage() {
         l.name?.toLowerCase().includes(s) || l.mobile?.includes(s) || l.city?.toLowerCase().includes(s)
       );
     }
+
+    // Build ownership history map
+    const oMap = new Map<string, OwnershipEntry[]>();
+    (historyData || []).forEach((h: any) => {
+      const arr = oMap.get(h.lead_id) || [];
+      arr.push(h);
+      oMap.set(h.lead_id, arr);
+    });
+    setOwnershipMap(oMap);
 
     setLeads(filtered);
     setLoading(false);
@@ -213,6 +227,7 @@ export default function LeadsPage() {
                     <TableHead className="text-xs min-w-[60px]">Age</TableHead>
                     <TableHead className="text-xs min-w-[90px]">Follow-up</TableHead>
                     <TableHead className="text-xs min-w-[90px]">Updated</TableHead>
+                    <TableHead className="text-xs min-w-[200px]">Ownership History</TableHead>
                     <TableHead className="text-xs min-w-[150px]">Notes</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -251,6 +266,32 @@ export default function LeadsPage() {
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(lead.updated_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground max-w-[250px]">
+                        {(() => {
+                          const history = ownershipMap.get(lead.id) || [];
+                          if (history.length === 0) return '—';
+                          return (
+                            <div className="flex flex-wrap gap-1">
+                              {history.map((h, i) => {
+                                const name = agentMap.get(h.owner_id) || 'Unknown';
+                                const isCurrent = !h.ended_at;
+                                return (
+                                  <span
+                                    key={i}
+                                    className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                                      isCurrent
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'bg-muted text-muted-foreground'
+                                    }`}
+                                  >
+                                    {name}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
                         {lead.notes || '—'}
